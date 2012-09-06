@@ -1,0 +1,44 @@
+{
+   "jsonrpc" : "2.0",
+   "method" : "Player.OnPause",
+   "params" : {
+      "data" : {
+         "item" : {
+            "type" : "movie"
+         },
+         "player" : {
+            "playerid" : 1,
+            "speed" : 0
+         },
+         "title" : ""
+      },
+      "sender" : "xbmc"
+   }
+}
+
+{
+   "jsonrpc" : "2.0",
+   "method" : "Player.OnPlay",
+   "params" : {
+      "data" : {
+         "item" : {
+            "type" : "movie"
+         },
+         "player" : {
+            "playerid" : 1,
+            "speed" : 1
+         },
+         "title" : ""
+      },
+      "sender" : "xbmc"
+   }
+}
+
+{
+   "jsonrpc" : "2.0",
+   "method" : "GUI.OnScreensaverDeactivated",
+   "params" : {
+      "data" : null,
+      "sender" : "xbmc"
+   }
+}

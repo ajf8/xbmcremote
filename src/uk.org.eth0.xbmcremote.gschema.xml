@@ -1,0 +1,56 @@
+<schemalist>
+  <!-- <enum id="uk.org.eth0.xbmcremote.myenum">
+    <value nick="first" value="1"/>
+    <value nick="second" value="2"/>
+  </enum>
+
+  <flags id="uk.org.eth0.xbmcremote.myflags">
+    <value nick="flag1" value="1"/>
+    <value nick="flag2" value="2"/>
+    <value nick="flag3" value="4"/>
+  </flags> -->
+
+  <schema path="/uk/org/eth0/xbmcremote/" id="uk.org.eth0.xbmcremote">
+    <key name="username" type="s">
+      <default>''</default>
+    </key>
+    <key name="password" type="s">
+      <default>''</default>
+    </key>
+    <key name="auth-enabled" type="b">
+      <default>false</default>
+    </key>
+    <key name="web-port" type="i">
+      <range min="1" max="65535"/>
+      <default>8080</default>
+    </key>
+    <key name="rpc-port" type="i">
+      <range min="1" max="65535"/>
+      <default>9090</default>
+    </key>
+    <key name="hostname" type="s">
+      <default>''</default>
+    </key>
+
+    <!-- <key name="key-with-choices" type="s">
+      <choices>
+        <choice value='Elisabeth'/>
+        <choice value='Annabeth'/>
+        <choice value='Joe'/>
+      </choices>
+      <aliases>
+        <alias value='Anna' target='Annabeth'/>
+        <alias value='Beth' target='Elisabeth'/>
+      </aliases>
+      <default>'Joe'</default>
+    </key>
+
+    <key name='enumerated-key' enum='uk.org.eth0.xbmcremote.myenum'>
+      <default>'first'</default>
+    </key>
+
+    <key name='flags-key' flags='uk.org.eth0.xbmcremote.myflags'>
+      <default>["flag1",flag2"]</default>
+    </key> -->
+  </schema>
+</schemalist>

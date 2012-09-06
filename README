@@ -1,0 +1,21 @@
+ABOUT
+
+xbmcremote.
+
+BUILDING
+
+  Building an xbmcremote release from the command line:
+
+    $ tar zxfv xbmcremote-0.1.tar.gz
+    $ cd xbmcremote-0.1
+    $ ./configure
+    $ make
+    # make install
+
+  Building from subversion checkout:
+    
+    $ svn co <repository URL>
+    $ ./autogen.sh
+    $ ./configure
+    $ make
+    # make install
