@@ -20,6 +20,7 @@
 #include <gtkmm.h>
 #include <glibmm.h>
 
+#include "client.h"
 #include "util.h"
 #include "preferences-dialog.h"
 
@@ -36,16 +37,24 @@ void PreferencesDialog::bind_active_sensitive(Gtk::CheckButton *check, Gtk::Widg
   check->signal_toggled().connect(sigc::bind(sigc::mem_fun(*this, &PreferencesDialog::on_bound_sensitive_active_toggled), check, widget));
 }
 
+void PreferencesDialog::on_client_connection_change(Client &client, Gtk::Button *connect_button, Gtk::Button *disconnect_button, bool criteria) {
+	connect_button->set_sensitive(!criteria);
+	disconnect_button->set_sensitive(criteria);
+}
+
 Gtk::Widget* PreferencesDialog::construct_connection_page()
 {
   Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create_from_file(
       Util::build_glade_path("preferences-connection.glade"));
+  bool is_connected = m_client.is_connected();
   Gtk::Entry *hostnameEntry;
   Gtk::Entry *userEntry;
   Gtk::Entry *passEntry;
   Gtk::SpinButton *webPortSpin;
   Gtk::SpinButton *jsonPortSpin;
   Gtk::CheckButton *authCheck;
+  Gtk::Button *bt_con;
+  Gtk::Button *bt_dis;
 
   builder->get_widget("connection-vbox", m_currentPage);
   builder->get_widget("json_port_spin", jsonPortSpin);
@@ -54,6 +63,15 @@ Gtk::Widget* PreferencesDialog::construct_connection_page()
   builder->get_widget("ck_auth", authCheck);
   builder->get_widget("entry_user", userEntry);
   builder->get_widget("entry_pass", passEntry);
+  builder->get_widget("bt_con", bt_con);
+  builder->get_widget("bt_dis", bt_dis);
+
+  bt_con->signal_clicked().connect(sigc::mem_fun(*this, &PreferencesDialog::connect_clicked));
+  bt_con->set_sensitive(!is_connected);
+  bt_dis->signal_clicked().connect(sigc::mem_fun(*this, &PreferencesDialog::disconnect_clicked));
+  bt_dis->set_sensitive(is_connected);
+  m_client.signal_disconnect().connect(sigc::bind(sigc::mem_fun(*this, &PreferencesDialog::on_client_connection_change), bt_con, bt_dis, false));
+  m_client.signal_connect().connect(sigc::bind(sigc::mem_fun(*this, &PreferencesDialog::on_client_connection_change), bt_con, bt_dis, true));
 
   m_refSettings->bind("hostname", hostnameEntry->property_text());
   m_refSettings->bind("auth-enabled", authCheck->property_active());
@@ -67,6 +85,14 @@ Gtk::Widget* PreferencesDialog::construct_connection_page()
   m_pluginContainer->add(*m_currentPage);
 
   return m_currentPage;
+}
+
+void PreferencesDialog::connect_clicked() {
+	m_client.connect();
+}
+
+void PreferencesDialog::disconnect_clicked() {
+	m_client.disconnect();
 }
 
 void PreferencesDialog::page_selection_changed()
@@ -103,9 +129,10 @@ bool PreferencesDialog::header_draw(const Cairo::RefPtr<Cairo::Context>& cr)
   return false;
 }
 
-PreferencesDialog::PreferencesDialog()
+PreferencesDialog::PreferencesDialog(Client &client)
     : m_pageStoreCols(),
-      m_currentPage(0)
+      m_currentPage(0),
+      m_client(client)
 {
   Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create_from_file(
       Util::build_glade_path("preferences.glade"));

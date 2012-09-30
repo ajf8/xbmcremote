@@ -36,7 +36,7 @@ public:
   static Glib::ustring build_glade_path(const Glib::ustring &file);
   static Glib::RefPtr<Gio::Settings> gsettings_create();
   static long json_time_to_seconds(const Json::Value &time);
-  static Glib::ustring seconds_to_short_time(long time);
+  static std::string seconds_to_short_time(long time);
 };
 
 }

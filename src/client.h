@@ -62,6 +62,7 @@ public:
 
   /* methods - control. */
   void start();
+  void connect();
   void disconnect();
   void write(const Json::Value& value);
   Glib::RefPtr<Gdk::Pixbuf> get_pixbuf(const Glib::ustring &vfslocation,
@@ -105,8 +106,8 @@ protected:
 
   /* fields - remote state. */
   XbmcState m_state;
-  long m_elapsed;
   long m_totalTime;
+  long m_elapsed;
   bool m_connected;
   int m_playlistid;
   Glib::RefPtr<PlaylistModel> m_playlist_model;
@@ -121,7 +122,7 @@ protected:
   deadline_timer m_heartbeat_timer;
 
   /* methods - I/O framework. */
-  void start_connect(tcp::resolver::iterator endpoint_iter);
+  void connect(tcp::resolver::iterator endpoint_iter);
   void handle_connect(const boost::system::error_code& ec,
       tcp::resolver::iterator endpoint_iter);
   void start_read();

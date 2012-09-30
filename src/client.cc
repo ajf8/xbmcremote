@@ -57,7 +57,7 @@ public:
   }
 
   void operator()() {
-    //boost::asio::io_service::work work(m_io_service);
+    boost::asio::io_service::work work(m_io_service);
     m_io_service.run();
   }
 
@@ -66,23 +66,26 @@ private:
 };
 
 Client::Client() :
-    m_io_service(), m_stopped(false), m_reader(), m_refSettings(Util::gsettings_create()),
-    m_state(STATE_NOPLAYER), m_connected(
-        false), m_playlistid(-1),
-        m_playlist_model(new PlaylistModel()), m_movies_model(new BrowseMoviesModel()),
-        m_socket(m_io_service), m_json_stream(), m_deadline(m_io_service),
-        m_bracket_counter(0), m_heartbeat_timer(m_io_service) {
+    m_io_service(), m_stopped(true), m_reader(), m_refSettings(Util::gsettings_create()),
+    m_state(STATE_NOPLAYER), m_totalTime(0), m_elapsed(0), m_connected(false),
+    m_playlistid(-1), m_playlist_model(new PlaylistModel()), m_movies_model(new BrowseMoviesModel()),
+    m_socket(m_io_service), m_json_stream(), m_deadline(m_io_service), m_bracket_counter(0),
+    m_heartbeat_timer(m_io_service) {
 }
 
 Client::~Client() {
   disconnect();
 }
 
-void Client::start() {
-  tcp::resolver r(m_io_service);
-  Glib::ustring portString = Glib::ustring::format(m_refSettings->get_int("rpc-port"));
+void Client::connect() {
+	m_stopped = false;
+	tcp::resolver r(m_io_service);
+	Glib::ustring portString = Glib::ustring::format(m_refSettings->get_int("rpc-port"));
+	connect(r.resolve(tcp::resolver::query(m_refSettings->get_string("hostname"), portString)));
+}
 
-  start_connect(r.resolve(tcp::resolver::query(m_refSettings->get_string("hostname"), portString)));
+void Client::start() {
+  connect();
   m_deadline.async_wait(boost::bind(&Client::check_deadline, this));
 
   Worker worker(m_io_service);
@@ -124,7 +127,7 @@ void Client::start_ping() {
     write(Requests::ping());
 }
 
-void Client::start_connect(tcp::resolver::iterator endpoint_iter) {
+void Client::connect(tcp::resolver::iterator endpoint_iter) {
   if (endpoint_iter != tcp::resolver::iterator()) {
     std::cout << "Trying " << endpoint_iter->endpoint() << "...\n";
     m_deadline.expires_from_now(boost::posix_time::seconds(CONNECT_TIMEOUT));
@@ -142,13 +145,13 @@ void Client::handle_connect(const boost::system::error_code& ec,
 
   if (!m_socket.is_open()) {
     std::cerr << "Connect timed out\n";
-    start_connect(++endpoint_iter);
+    connect(++endpoint_iter);
     //fire_signal_conn_error_idle("Timeout");
   } else if (ec) {
     std::cerr << "Connect error: " << ec.message() << "\n";
     m_socket.close();
     //fire_signal_conn_error_idle(ec.message());
-    start_connect(++endpoint_iter);
+    connect(++endpoint_iter);
   } else {
     std::cout << "Connected to " << endpoint_iter->endpoint() << "\n";
     start_read();

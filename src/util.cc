@@ -19,6 +19,7 @@
 
 #include <string>
 
+#include <boost/format.hpp>
 #include <glibmm.h>
 #include <giomm.h>
 #include "util.h"
@@ -41,11 +42,13 @@ long Util::json_time_to_seconds(const Json::Value &time)
   return (time["hours"].asUInt()*60*60) + (time["minutes"].asUInt()*60) + time["seconds"].asUInt();
 }
 
-Glib::ustring Util::seconds_to_short_time(long time)
+std::string Util::seconds_to_short_time(long seconds)
 {
-  std::stringstream stream;
-  stream << floor(time/60) << ":" << time%60;
-  return stream.str();
+  int hours = seconds / 3600;
+  int minutes = (seconds % 3600) / 60;
+  int secondsPart = (seconds % 3600) % 60;
+
+  return (boost::format("%02d:%02d:%02d") % hours % minutes % secondsPart).str();
 }
 
 }

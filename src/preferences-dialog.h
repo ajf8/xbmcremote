@@ -18,6 +18,7 @@
  */
 
 #include "gtkmm.h"
+#include "client.h"
 
 #ifndef PREFERENCES_DIALOG_H_
 #define PREFERENCES_DIALOG_H_
@@ -31,7 +32,7 @@ enum PreferencesPage {
 
 class PreferencesDialog : public Gtk::Dialog {
 public:
-  PreferencesDialog();
+  PreferencesDialog(Client &client);
 protected:
   class PageColumns : public Gtk::TreeModel::ColumnRecord
   {
@@ -48,7 +49,10 @@ protected:
   void bind_active_sensitive(Gtk::CheckButton *check, Gtk::Widget *widget);
   Gtk::TreeModel::iterator add_page(PreferencesPage ppid, const Glib::ustring &name);
   Gtk::TreeModel::iterator populate_page_store();
+  void on_client_connection_change(Client &client, Gtk::Button *connect_button, Gtk::Button *disconnect_button, bool criteria);
   Gtk::Widget* construct_connection_page();
+  void connect_clicked();
+  void disconnect_clicked();
   void page_selection_changed();
   bool header_draw(const Cairo::RefPtr<Cairo::Context>& cr);
 
@@ -61,6 +65,7 @@ protected:
   Gtk::Container *m_pluginContainer;
   Gtk::Widget *m_currentPage;
   //Gtk::Button *m_closeButton;
+  Client &m_client;
 };
 
 }

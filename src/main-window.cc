@@ -183,7 +183,7 @@ void MainWindow::on_playlist_add_clicked() {
 }
 
 void MainWindow::on_settings_button_clicked() {
-  PreferencesDialog pd;
+  PreferencesDialog pd(m_client);
   pd.run();
 }
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <!-- interface-requires gtk+ 2.12 -->
+  <!-- interface-requires gtk+ 3.0 -->
   <object class="GtkTable" id="connection-vbox">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -20,6 +20,7 @@
             <property name="xscale">0</property>
             <child>
               <object class="GtkButton" id="bt_dis">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="can_focus">True</property>
@@ -83,7 +84,9 @@
             <property name="xscale">0</property>
             <child>
               <object class="GtkButton" id="bt_con">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
+                <property name="sensitive">False</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="use_action_appearance">False</property>
@@ -160,6 +163,12 @@
             <property name="column_spacing">6</property>
             <property name="row_spacing">6</property>
             <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
               <object class="GtkLabel" id="label3">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -203,6 +212,7 @@
             <child>
               <object class="GtkCheckButton" id="ck_auth">
                 <property name="label" translatable="yes">_Use Authentication</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
@@ -366,6 +376,7 @@
             <child>
               <object class="GtkCheckButton" id="ck_autocon">
                 <property name="label" translatable="yes">_Autoconnect</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
@@ -383,12 +394,6 @@
                 <property name="x_options">GTK_FILL</property>
                 <property name="y_options"></property>
               </packing>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
             </child>
           </object>
         </child>
