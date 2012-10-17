@@ -118,7 +118,7 @@ void Client::fire_signal_conn_error_idle(const std::string& msg) {
 }
 
 void Client::disconnect_in_main_loop() {
-  m_playlist_model.clear();
+  m_playlist_model->clear();
   m_signal_disconnect(*this);
 }
 
@@ -329,7 +329,7 @@ bool Client::is_item_active() {
   return m_playlistid >= 0;
 }
 
-Glib::RefPtr<PlaylistModel> Client::playlist_model() {
+Glib::RefPtr<PlaylistModel>& Client::playlist_model() {
   return m_playlist_model;
 }
 

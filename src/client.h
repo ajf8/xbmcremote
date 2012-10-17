@@ -75,7 +75,7 @@ public:
   bool is_connected();
   Gtk::TreeIter get_active_iter();
   bool is_item_active();
-  Glib::RefPtr<PlaylistModel> playlist_model();
+  Glib::RefPtr<PlaylistModel>& playlist_model();
   long get_elapsed();
   long get_total_time();
 
