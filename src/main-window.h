@@ -68,6 +68,7 @@ protected:
   Gtk::Widget* create_playlist();
   Gtk::Widget* create_image();
   Gtk::TreeViewColumn& append_and_get_column(Gtk::TreeView &tv, const Glib::ustring &title, Gtk::CellRenderer &cr);
+  void on_browse_click(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* column);
   Gtk::Widget* create_remote();
   Gtk::Widget* create_browser();
   Gtk::Widget* create_player();
@@ -104,7 +105,6 @@ protected:
   Gtk::Scale *m_progressScale;
   Gtk::Label *m_progressLabel;
   Gtk::Label *m_primaryLabel;
-
 
   /* UI fields - playlist. */
   Gtk::Box *m_playlistBox;

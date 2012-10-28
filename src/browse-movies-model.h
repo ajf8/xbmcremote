@@ -17,6 +17,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include <jsoncpp/value.h>
+
+#include "client.h"
 #include "browse-model.h"
 
 #ifndef BROWSE_MOVIES_MODEL_H_
@@ -34,10 +37,13 @@ public:
   Gtk::TreeModelColumn<double> m_col_rating;
 };
 
+typedef boost::shared_ptr<Json::Value> JsonPtr;
+
 class BrowseMoviesModel : public BrowseModel {
 public:
   BrowseMoviesModel();
   BrowseMoviesModelColumns& columns();
+  void update(JsonPtr json);
 protected:
   BrowseMoviesModelColumns m_cols;
 };

@@ -38,6 +38,7 @@ enum RequestIdentifier
   ID_PLAY_PAUSE,
   ID_STOP,
   ID_PLAYLIST_CLEAR,
+  ID_GET_SOURCES,
   ID_DO_NOTHING
 };
 
@@ -48,6 +49,7 @@ public:
   static Json::Value get_active_players();
   static Json::Value get_items(RequestIdentifier id, uint playlistid = DEFAULT_PLAYER_ID);
   static Json::Value get_properties(RequestIdentifier id, uint playerid = DEFAULT_PLAYER_ID);
+  static Json::Value get_sources(const std::string &media);
   static Json::Value play_pause(uint playerid = DEFAULT_PLAYER_ID);
   static Json::Value stop(uint playerid = DEFAULT_PLAYER_ID);
   static Json::Value playlist_clear(uint playlistid = DEFAULT_PLAYLIST_ID);

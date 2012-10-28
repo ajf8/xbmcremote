@@ -60,6 +60,9 @@ public:
   Client();
   ~Client();
 
+  /* accessors */
+  Glib::RefPtr<BrowseMoviesModel> get_movies_model();
+
   /* methods - control. */
   void start();
   void connect();

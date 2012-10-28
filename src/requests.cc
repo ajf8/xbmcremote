@@ -150,4 +150,19 @@ Json::Value Requests::get_properties(RequestIdentifier id, uint playerid)
   return value;
 }
 
+Json::Value Requests::get_sources(const std::string &media)
+{
+	  Json::Value value;
+	  Json::Value params;
+
+	  value["jsonrpc"] = "2.0";
+	  value["method"] = "Files.GetSources";
+	  value["id"] = ID_GET_SOURCES;
+
+	  params["media"] = media;
+	  value["params"] = params;
+
+	  return value;
+}
+
 }

@@ -17,6 +17,10 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include <iostream>
+#include <jsoncpp/value.h>
+
+#include "client.h"
 #include "browse-model.h"
 #include "browse-movies-model.h"
 
@@ -30,6 +34,20 @@ BrowseMoviesModel::BrowseMoviesModel() : m_cols()
 BrowseMoviesModelColumns& BrowseMoviesModel::columns()
 {
   return m_cols;
+}
+
+void BrowseMoviesModel::update(JsonPtr json) {
+// result -> sources -> file
+  const Json::Value &result = (*json)["result"];
+  const Json::Value &sources = result["sources"];
+
+  for (unsigned int i = 0; i < sources.size(); i++) {
+    const Json::Value &item = sources[i];
+    Gtk::TreeModel::Row row = *append();
+    row[m_cols.m_col_label] = item["label"].asString();
+    std::cout << "adding " << item["label"].asString() << std::endl;
+    row[m_cols.m_col_path] = item["path"].asString();
+  }
 }
 
 }

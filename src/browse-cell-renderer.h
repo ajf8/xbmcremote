@@ -30,11 +30,13 @@ class BrowseCellRenderer : public Gtk::CellRenderer
 {
 public:
   Glib::PropertyProxy<Glib::ustring> property_thumbnail();
-  Glib::PropertyProxy<Glib::ustring> property_title();
+  Glib::PropertyProxy<Glib::ustring> property_label();
+  Glib::PropertyProxy<Glib::ustring> property_path();
 protected:
   BrowseCellRenderer();
   Glib::Property< Glib::ustring > m_property_thumbnail;
-  Glib::Property< Glib::ustring > m_property_title;
+  Glib::Property< Glib::ustring > m_property_label;
+  Glib::Property< Glib::ustring > m_property_path;
   Gtk::CellRendererText m_titleTextRenderer;
   Gtk::CellRendererPixbuf m_pixbufRenderer;
 };

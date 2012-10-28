@@ -42,13 +42,26 @@ void BrowseMoviesCellRenderer::render_vfunc(const Cairo::RefPtr<Cairo::Context>&
 
   //Gdk::Rectangle pixbuf_area = background_area;
 
-  title_area.set_x(xpad);
+  /*title_area.set_x(xpad);
   title_area.set_y(ypad);
-  title_area.set_height(title_area.get_height()+ypad);
-  title_area.set_width(title_area.get_width()+xpad);
+  title_area.set_height(title_area.get_height()+(ypad*2));
+  title_area.set_width(title_area.get_width()+(xpad*2));*/
 
-  m_titleTextRenderer.property_text() = property_title().get_value();
+  m_titleTextRenderer.property_text() = property_label().get_value();
   m_titleTextRenderer.render(cr, widget, title_area, title_area, flags);
+}
+
+void BrowseMoviesCellRenderer::get_size_vfunc (Gtk::Widget& widget, const Gdk::Rectangle* cell_area, int* x_offset, int* y_offset, int* width, int* height) const
+{
+  GtkRequisition name_size_minimum;
+  GtkRequisition name_size_natural;
+  int xpad, ypad;
+
+  get_padding(xpad, ypad);
+
+  m_titleTextRenderer.get_preferred_size(widget, name_size_minimum, name_size_natural);
+  *width = (name_size_natural.width+(xpad*2));
+  *height = (name_size_natural.height+(ypad*2));
 }
 
 }

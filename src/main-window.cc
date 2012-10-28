@@ -54,14 +54,13 @@ MainWindow::MainWindow() :
     m_ph1("ph1", m_dock, Gdl::DOCK_TOP, false),
     m_ph2("ph2", m_dock, Gdl::DOCK_BOTTOM, false),
     m_ph3("ph3", m_dock, Gdl::DOCK_LEFT, false),
-    m_ph4("ph4", m_dock, Gdl::DOCK_RIGHT, false),
-    m_browserModelMovies(new BrowseMoviesModel())
+    m_ph4("ph4", m_dock, Gdl::DOCK_RIGHT, false)
 {
   signal_delete_event().connect(
       sigc::mem_fun(*this, &MainWindow::on_delete_event));
   set_default_icon_name(Gtk::Stock::NETWORK.id);
 
-  //m_layout_manager->load_from_file("xbmcremote-layout.xml");
+  m_layout_manager->load_from_file("xbmcremote-layout.xml");
 
   Gdl::DockBar* dockbar = new Gdl::DockBar(m_dock);
   dockbar->set_style(Gdl::DOCK_BAR_BOTH);
@@ -74,7 +73,7 @@ MainWindow::MainWindow() :
   create_items();
 
   set_title("xbmcremote");
-  //set_default_size(100, 600);
+  set_default_size(550, 250);
   add(*Gtk::manage(box));
   show_all_children();
 
@@ -82,15 +81,25 @@ MainWindow::MainWindow() :
 }
 
 void MainWindow::create_items() {
-  m_playerDockItem.add(*create_player());
-  m_playlistDockItem.add(*create_playlist());
-  m_imageDockItem.add(*create_image());
-  m_remoteDockItem.add(*create_remote());
-  m_browserDockItem.add(*create_browser());
-
   m_dock.add_item(m_playerDockItem, Gdl::DOCK_TOP);
+  m_dock.add_item(m_imageDockItem, Gdl::DOCK_RIGHT);
+  m_dock.add_item(m_remoteDockItem, Gdl::DOCK_BOTTOM);
+  //m_dock.add_item(m_browserDockItem, Gdl::DOCK_BOTTOM);
+  m_dock.add_item(m_playlistDockItem, Gdl::DOCK_BOTTOM);
+
   m_playlistDockItem.dock_to(m_playerDockItem, Gdl::DOCK_BOTTOM);
+  m_imageDockItem.dock_to(m_playlistDockItem, Gdl::DOCK_RIGHT);
   m_remoteDockItem.dock_to(m_playerDockItem, Gdl::DOCK_RIGHT);
+
+  m_playerDockItem.add(*create_player());
+  m_playerDockItem.set_vexpand(false);
+  m_remoteDockItem.add(*create_remote());
+  m_remoteDockItem.set_vexpand(false);
+  m_playlistDockItem.add(*create_playlist());
+  m_playlistDockItem.set_vexpand(true);
+  m_imageDockItem.add(*create_image());
+  m_imageDockItem.set_vexpand((false));
+  m_browserDockItem.add(*create_browser());
 }
 
 Gtk::Widget* MainWindow::create_image() {
@@ -121,23 +130,31 @@ Gtk::Widget* MainWindow::create_browser()
   Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create_from_file(
       Util::build_glade_path("browser.glade"));
   BrowseMoviesCellRenderer *bcr = Gtk::manage(new BrowseMoviesCellRenderer());
-  BrowseMoviesModelColumns& columns = m_browserModelMovies->columns();
+  Glib::RefPtr<BrowseMoviesModel> model = m_client.get_movies_model();
+  BrowseMoviesModelColumns& columns = model->columns();
 
   builder->get_widget("browserBox", m_browserBox);
   builder->get_widget("browserTreeView", m_browserTreeView);
 
-  Gtk::TreeModel::Row row = *(m_browserModelMovies->append());
+  /*Gtk::TreeModel::Row row = *(m_browserModelMovies->append());
   row[columns.m_col_thumbnail] = "special://masterprofile/Thumbnails/Video/5/5d807579.tbn";
-  row[columns.m_col_title] = "Title";
+  row[columns.m_col_label] = "Title";*/
 
-  m_browserTreeView->set_model(m_browserModelMovies);
+  m_browserTreeView->set_model(model);
 
   m_browserTreeView->append_column("Item", *bcr);
   Gtk::TreeViewColumn *viewCol = m_browserTreeView->get_column(0);
   viewCol->add_attribute(bcr->property_thumbnail(), columns.m_col_thumbnail);
-  viewCol->add_attribute(bcr->property_title(), columns.m_col_title);
+  viewCol->add_attribute(bcr->property_label(), columns.m_col_label);
+
+  m_browserTreeView->signal_row_activated().connect(sigc::mem_fun(*this, &MainWindow::on_browse_click));
 
   return m_browserBox;
+}
+
+void MainWindow::on_browse_click(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* column)
+{
+
 }
 
 Gtk::Widget* MainWindow::create_remote() {
@@ -360,8 +377,10 @@ void MainWindow::set_playpause_dependent_widgets(XbmcState state)
   m_stopButton->set_sensitive(playPause);
   m_progressScale->set_sensitive(playPause);
 
-  if (!playPause)
+  if (!playPause) {
     m_progressLabel->set_text("");
+    m_playlistImage->clear();
+  }
 
   m_playPauseButton->set_image(
       state == STATE_PLAY ? *m_pauseImage : *m_playImage);
@@ -376,7 +395,7 @@ void MainWindow::set_connection_dependent_widgets(bool connected)
 void MainWindow::on_client_connect(Client &client) {
   set_connection_dependent_widgets(true);
   refresh_player(client);
-  m_imageDockItem.dock_to(m_playerDockItem, Gdl::DOCK_RIGHT);
+  //m_imageDockItem.dock_to(m_playerDockItem, Gdl::DOCK_RIGHT);
 }
 
 void MainWindow::on_client_disconnect(Client &client)

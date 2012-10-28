@@ -28,7 +28,8 @@ namespace XbmcRemote {
 BrowseCellRenderer::BrowseCellRenderer() :
     Glib::ObjectBase( typeid(BrowseCellRenderer) ),
     m_property_thumbnail( *this, "thumbnail", "" ),
-    m_property_title( *this, "title", "" ),
+    m_property_label( *this, "label", "" ),
+    m_property_path( *this, "path", "" ),
     m_titleTextRenderer(), m_pixbufRenderer()
 {
   set_padding(GUI_PAD_SMALL, GUI_PAD_SMALL);
@@ -39,9 +40,14 @@ Glib::PropertyProxy<Glib::ustring> BrowseCellRenderer::property_thumbnail()
   return m_property_thumbnail.get_proxy();
 }
 
-Glib::PropertyProxy<Glib::ustring> BrowseCellRenderer::property_title()
+Glib::PropertyProxy<Glib::ustring> BrowseCellRenderer::property_label()
 {
-  return m_property_title.get_proxy();
+  return m_property_label.get_proxy();
+}
+
+Glib::PropertyProxy<Glib::ustring> BrowseCellRenderer::property_path()
+{
+  return m_property_path.get_proxy();
 }
 
 }

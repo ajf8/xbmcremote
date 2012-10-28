@@ -28,13 +28,15 @@ class BrowseModelColumns : public Gtk::TreeModel::ColumnRecord
 {
 public:
   BrowseModelColumns() {
+    add(m_col_label);
+    add(m_col_path);
     add(m_col_thumbnail);
     add(m_col_playcount);
-    add(m_col_title);
   }
 
   Gtk::TreeModelColumn<Glib::ustring> m_col_thumbnail;
-  Gtk::TreeModelColumn<Glib::ustring> m_col_title;
+  Gtk::TreeModelColumn<Glib::ustring> m_col_label;
+  Gtk::TreeModelColumn<Glib::ustring> m_col_path;
   Gtk::TreeModelColumn<unsigned int> m_col_playcount;
 };
 

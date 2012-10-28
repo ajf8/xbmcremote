@@ -127,6 +127,11 @@ void Client::start_ping() {
     write(Requests::ping());
 }
 
+Glib::RefPtr<BrowseMoviesModel> Client::get_movies_model()
+{
+  return m_movies_model;
+}
+
 void Client::connect(tcp::resolver::iterator endpoint_iter) {
   if (endpoint_iter != tcp::resolver::iterator()) {
     std::cout << "Trying " << endpoint_iter->endpoint() << "...\n";
@@ -156,6 +161,8 @@ void Client::handle_connect(const boost::system::error_code& ec,
     std::cout << "Connected to " << endpoint_iter->endpoint() << "\n";
     start_read();
     write(Requests::get_active_players());
+    //start_read();
+    write(Requests::get_sources("video"));
     start_ping();
   }
 }
@@ -218,6 +225,9 @@ void Client::handle_json_idle(JsonPtr root_ptr) {
       m_connected = true;
       m_signal_connect(*this);
       break;
+    case ID_GET_SOURCES:
+      m_movies_model->update(root_ptr);
+    	break;
     }
   } else if (root.isMember("method")) {
     const Json::Value &method = root["method"];
