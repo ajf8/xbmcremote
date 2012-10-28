@@ -21,9 +21,20 @@
 
 namespace XbmcRemote {
 
-BrowseModel::BrowseModel()
+BrowseModel::BrowseModel() : m_breadcrumbs()
 {
 
+}
+
+void BrowseModel::add_breadcrumb(BrowseBreadcrumb& crumb)
+{
+  m_breadcrumbs.push_back(crumb);
+}
+
+void BrowseModel::pop_breadcrumbs(unsigned int n)
+{
+  for (unsigned int i = 0; i < n; i++)
+    m_breadcrumbs.pop_back();
 }
 
 }

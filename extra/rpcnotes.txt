@@ -1,3 +1,6 @@
+{"jsonrpc": "2.0", "method": "Playlist.Add", "params": { "item" : { "file": "/home/alan/Videos/File.avi"}, "playlistid": 1 }, "id": 1}
+{"jsonrpc": "2.0", "method": "Player.Open", "params" : { "item" : { "playlistid" : 1, "position": 0 } }, "id": 1}
+
 {
    "jsonrpc" : "2.0",
    "method" : "Player.OnPause",

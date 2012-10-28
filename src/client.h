@@ -68,8 +68,8 @@ public:
   void connect();
   void disconnect();
   void write(const Json::Value& value);
-  Glib::RefPtr<Gdk::Pixbuf> get_pixbuf(const Glib::ustring &vfslocation,
-      double scale);
+  Glib::RefPtr<Gdk::Pixbuf> get_pixbuf(const Glib::ustring &vfslocation, double scale);
+  void open(unsigned int type, Glib::ustring &label, Glib::ustring &target);
 
   /* methods - remote state. */
   int get_playlistid();

@@ -44,18 +44,17 @@ bool MainWindow::on_delete_event(GdkEventAny* event) {
 }
 
 MainWindow::MainWindow() :
-    m_xvfs(),
-    m_client(), m_layout_manager(Gdl::DockLayout::create(m_dock)),
-    m_imageDockItem("image", "Thumbnail", Gtk::Stock::FIND, Gdl::DOCK_ITEM_BEH_NORMAL),
-    m_playerDockItem("player", "Player", Gdl::DOCK_ITEM_BEH_CANT_CLOSE | Gdl::DOCK_ITEM_BEH_NEVER_FLOATING | Gdl::DOCK_ITEM_BEH_LOCKED | Gdl::DOCK_ITEM_BEH_NO_GRIP),
-    m_playlistDockItem("playlist", "Playlist", Gtk::Stock::INDEX, Gdl::DOCK_ITEM_BEH_NORMAL),
-    m_remoteDockItem("remote", "Remote", Gtk::Stock::NETWORK, Gdl::DOCK_ITEM_BEH_NORMAL),
-    m_browserDockItem("browser", "Browser", Gtk::Stock::FILE, Gdl::DOCK_ITEM_BEH_NORMAL),
-    m_ph1("ph1", m_dock, Gdl::DOCK_TOP, false),
-    m_ph2("ph2", m_dock, Gdl::DOCK_BOTTOM, false),
-    m_ph3("ph3", m_dock, Gdl::DOCK_LEFT, false),
-    m_ph4("ph4", m_dock, Gdl::DOCK_RIGHT, false)
-{
+    m_xvfs(), m_client(), m_layout_manager(Gdl::DockLayout::create(m_dock)), m_imageDockItem(
+        "image", "Thumbnail", Gtk::Stock::FIND, Gdl::DOCK_ITEM_BEH_NORMAL), m_playerDockItem(
+        "player", "Player",
+        Gdl::DOCK_ITEM_BEH_CANT_CLOSE | Gdl::DOCK_ITEM_BEH_NEVER_FLOATING
+            | Gdl::DOCK_ITEM_BEH_LOCKED | Gdl::DOCK_ITEM_BEH_NO_GRIP), m_playlistDockItem(
+        "playlist", "Playlist", Gtk::Stock::INDEX, Gdl::DOCK_ITEM_BEH_NORMAL), m_remoteDockItem(
+        "remote", "Remote", Gtk::Stock::NETWORK, Gdl::DOCK_ITEM_BEH_NORMAL), m_browserDockItem(
+        "browser", "Browser", Gtk::Stock::FILE, Gdl::DOCK_ITEM_BEH_NORMAL), m_ph1(
+        "ph1", m_dock, Gdl::DOCK_TOP, false), m_ph2("ph2", m_dock,
+        Gdl::DOCK_BOTTOM, false), m_ph3("ph3", m_dock, Gdl::DOCK_LEFT, false), m_ph4(
+        "ph4", m_dock, Gdl::DOCK_RIGHT, false) {
   signal_delete_event().connect(
       sigc::mem_fun(*this, &MainWindow::on_delete_event));
   set_default_icon_name(Gtk::Stock::NETWORK.id);
@@ -120,13 +119,11 @@ void MainWindow::on_generic_request_click(const std::string &method) {
   m_client.write(Requests::generic(method));
 }
 
-void MainWindow::dispatch_request(Json::Value request)
-{
+void MainWindow::dispatch_request(Json::Value request) {
   m_client.write(request);
 }
 
-Gtk::Widget* MainWindow::create_browser()
-{
+Gtk::Widget* MainWindow::create_browser() {
   Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create_from_file(
       Util::build_glade_path("browser.glade"));
   BrowseMoviesCellRenderer *bcr = Gtk::manage(new BrowseMoviesCellRenderer());
@@ -137,8 +134,8 @@ Gtk::Widget* MainWindow::create_browser()
   builder->get_widget("browserTreeView", m_browserTreeView);
 
   /*Gtk::TreeModel::Row row = *(m_browserModelMovies->append());
-  row[columns.m_col_thumbnail] = "special://masterprofile/Thumbnails/Video/5/5d807579.tbn";
-  row[columns.m_col_label] = "Title";*/
+   row[columns.m_col_thumbnail] = "special://masterprofile/Thumbnails/Video/5/5d807579.tbn";
+   row[columns.m_col_label] = "Title";*/
 
   m_browserTreeView->set_model(model);
 
@@ -147,14 +144,24 @@ Gtk::Widget* MainWindow::create_browser()
   viewCol->add_attribute(bcr->property_thumbnail(), columns.m_col_thumbnail);
   viewCol->add_attribute(bcr->property_label(), columns.m_col_label);
 
-  m_browserTreeView->signal_row_activated().connect(sigc::mem_fun(*this, &MainWindow::on_browse_click));
+  m_browserTreeView->signal_row_activated().connect(
+      sigc::mem_fun(*this, &MainWindow::on_browse_click));
 
   return m_browserBox;
 }
 
-void MainWindow::on_browse_click(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* column)
-{
+void MainWindow::on_browse_click(const Gtk::TreeModel::Path& path,
+    Gtk::TreeViewColumn* column) {
+  Glib::RefPtr<BrowseMoviesModel> model = m_client.get_movies_model();
+  BrowseMoviesModelColumns& columns = model->columns();
+  Gtk::TreeModel::iterator iter = model->get_iter(path);
 
+  if (iter) {
+    Glib::ustring target = (*iter)[columns.m_col_path];
+    Glib::ustring label = (*iter)[columns.m_col_label];
+    unsigned int type = (*iter)[columns.m_col_type];
+    m_client.open(type, label, target);
+  }
 }
 
 Gtk::Widget* MainWindow::create_remote() {
@@ -219,12 +226,10 @@ Gtk::Widget* MainWindow::create_playlist() {
       m_client.playlist_model()->columns().m_col_label);
 
   m_plClearButton->signal_clicked().connect(
-      sigc::bind(
-          sigc::mem_fun(*this, &MainWindow::dispatch_request),
+      sigc::bind(sigc::mem_fun(*this, &MainWindow::dispatch_request),
           Requests::playlist_clear()));
   m_plAddButton->signal_clicked().connect(
-          sigc::mem_fun(*this, &MainWindow::on_playlist_add_clicked));
-
+      sigc::mem_fun(*this, &MainWindow::on_playlist_add_clicked));
 
   return m_playlistBox;
 }
@@ -254,9 +259,11 @@ Gtk::Widget* MainWindow::create_player() {
           sigc::mem_fun(*this, &MainWindow::on_generic_player_request_click),
           "Player.GoNext"));
   m_playPauseButton->signal_clicked().connect(
-      sigc::bind(sigc::mem_fun(*this, &MainWindow::dispatch_request), Requests::play_pause()));
+      sigc::bind(sigc::mem_fun(*this, &MainWindow::dispatch_request),
+          Requests::play_pause()));
   m_stopButton->signal_clicked().connect(
-      sigc::bind(sigc::mem_fun(*this, &MainWindow::dispatch_request), Requests::stop()));
+      sigc::bind(sigc::mem_fun(*this, &MainWindow::dispatch_request),
+          Requests::stop()));
 
   m_settingsButton->signal_clicked().connect(
       sigc::mem_fun(*this, &MainWindow::on_settings_button_clicked));
@@ -304,9 +311,9 @@ void MainWindow::on_client_pause(Client &client, Client::JsonPtr json_ptr) {
 void MainWindow::on_client_seek(Client &client, long elapsed, long total) {
   m_progressScale->set_range(0, total);
   m_progressScale->set_value(elapsed);
-  m_progressLabel->set_text(Glib::ustring::format(
-      Util::seconds_to_short_time(elapsed), " / ",
-      Util::seconds_to_short_time(total)));
+  m_progressLabel->set_text(
+      Glib::ustring::format(Util::seconds_to_short_time(elapsed), " / ",
+          Util::seconds_to_short_time(total)));
 }
 
 void MainWindow::on_client_speed_change(Client &client,
@@ -327,8 +334,7 @@ void MainWindow::on_client_conn_error(Client &client, const std::string &msg) {
   box.run();
 }
 
-void MainWindow::cache_object_state_change(XVFSCacheObject &obj)
-{
+void MainWindow::cache_object_state_change(XVFSCacheObject &obj) {
   if (obj.get_state() == CS_CACHED)
     m_playlistImage->set(obj.scale(160));
 }
@@ -343,9 +349,13 @@ void MainWindow::refresh_player(Client &client) {
     Glib::ustring label = (*iter)[columns.m_col_label];
 
     try {
-      boost::shared_ptr<XVFSCacheObject> cacheObject = m_xvfs.get((*iter)[columns.m_col_thumbnail]);
-      cacheObject->signal_state_change().connect(sigc::mem_fun(*this, &MainWindow::cache_object_state_change));
-      m_xvfs.fetch_async(cacheObject);
+      const Glib::ustring thumbnail = (*iter)[columns.m_col_thumbnail];
+      if (!thumbnail.empty()) {
+        boost::shared_ptr<XVFSCacheObject> cacheObject = m_xvfs.get(thumbnail);
+        cacheObject->signal_state_change().connect(
+            sigc::mem_fun(*this, &MainWindow::cache_object_state_change));
+        m_xvfs.fetch_async(cacheObject);
+      }
     } catch (const Gdk::PixbufError &e) {
       std::cerr << "unable to get pixbuf" << std::endl;
     } catch (const std::exception &e) {
@@ -358,9 +368,10 @@ void MainWindow::refresh_player(Client &client) {
     }
 
     m_primaryLabel->set_text(label);
-    m_progressLabel->set_text(Glib::ustring::format(
-        Util::seconds_to_short_time(m_client.get_elapsed()), " / ",
-        Util::seconds_to_short_time(m_client.get_total_time())));
+    m_progressLabel->set_text(
+        Glib::ustring::format(
+            Util::seconds_to_short_time(m_client.get_elapsed()), " / ",
+            Util::seconds_to_short_time(m_client.get_total_time())));
     m_progressScale->set_range(0, m_client.get_total_time());
     m_progressScale->set_value(m_client.get_elapsed());
   } else {
@@ -368,8 +379,7 @@ void MainWindow::refresh_player(Client &client) {
   }
 }
 
-void MainWindow::set_playpause_dependent_widgets(XbmcState state)
-{
+void MainWindow::set_playpause_dependent_widgets(XbmcState state) {
   bool playPause = (state == STATE_PLAY || state == STATE_PAUSE);
   m_playPauseButton->set_sensitive(playPause);
   m_playerNextButton->set_sensitive(playPause);
@@ -386,8 +396,7 @@ void MainWindow::set_playpause_dependent_widgets(XbmcState state)
       state == STATE_PLAY ? *m_pauseImage : *m_playImage);
 }
 
-void MainWindow::set_connection_dependent_widgets(bool connected)
-{
+void MainWindow::set_connection_dependent_widgets(bool connected) {
   m_remoteGrid->set_sensitive(connected);
   m_playlistBox->set_sensitive(connected);
 }
@@ -398,8 +407,7 @@ void MainWindow::on_client_connect(Client &client) {
   //m_imageDockItem.dock_to(m_playerDockItem, Gdl::DOCK_RIGHT);
 }
 
-void MainWindow::on_client_disconnect(Client &client)
-{
+void MainWindow::on_client_disconnect(Client &client) {
   m_primaryLabel->set_label("Disconnected.");
   set_connection_dependent_widgets(false);
   set_playpause_dependent_widgets(client.get_state());

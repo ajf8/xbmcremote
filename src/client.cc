@@ -161,7 +161,11 @@ void Client::handle_connect(const boost::system::error_code& ec,
     std::cout << "Connected to " << endpoint_iter->endpoint() << "\n";
     start_read();
     write(Requests::get_active_players());
-    //start_read();
+    BrowseBreadcrumb crumb;
+    crumb.path = "";
+    crumb.name = "Sources";
+    crumb.type = TYPE_ROOT;
+    m_movies_model->add_breadcrumb(crumb);
     write(Requests::get_sources("video"));
     start_ping();
   }
@@ -198,6 +202,14 @@ void Client::handle_json_idle(JsonPtr root_ptr) {
   const Json::Value &root = *root_ptr;
 
   if (root.isMember("error")) {
+    if (root.isMember("id")) {
+      switch (root["id"].asInt()) {
+      case ID_GET_SOURCES:
+      case ID_GET_DIRECTORY:
+        m_movies_model->pop_breadcrumbs(1);
+        break;
+      }
+    }
     m_signal_remote_error(*this, root_ptr);
   } else if (root.isMember("id")) {
     /* Response has an ID, so it was sent by us and use that ID to figure
@@ -226,6 +238,7 @@ void Client::handle_json_idle(JsonPtr root_ptr) {
       m_signal_connect(*this);
       break;
     case ID_GET_SOURCES:
+    case ID_GET_DIRECTORY:
       m_movies_model->update(root_ptr);
     	break;
     }
@@ -391,6 +404,28 @@ void Client::handle_read(const boost::system::error_code& ec) {
     std::cout << "Error on receive: " << ec.message() << "\n";
     disconnect();
     fire_signal_conn_error_idle(ec.message());
+  }
+}
+
+void Client::open(unsigned int type, Glib::ustring &label, Glib::ustring &target)
+{
+  if (type & TYPE_PARENT) {
+    m_movies_model->pop_breadcrumbs(1);
+  } else if (type & ~TYPE_FILE) {
+    BrowseBreadcrumb crumb;
+    crumb.path = target;
+    crumb.name = label;
+    crumb.type = type;
+    m_movies_model->add_breadcrumb(crumb);
+  }
+
+  if (type & TYPE_ROOT) {
+    write(Requests::get_sources("video"));
+  } else if (type & TYPE_FILE) {
+    write(Requests::playlist_add(target));
+    write(Requests::player_open());
+  } else {
+    write(Requests::get_directory(target));
   }
 }
 

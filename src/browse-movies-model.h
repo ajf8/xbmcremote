@@ -18,6 +18,8 @@
  */
 
 #include <jsoncpp/value.h>
+#include <string>
+#include <list>
 
 #include "client.h"
 #include "browse-model.h"
@@ -46,6 +48,7 @@ public:
   void update(JsonPtr json);
 protected:
   BrowseMoviesModelColumns m_cols;
+
 };
 
 }

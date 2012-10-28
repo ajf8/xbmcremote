@@ -26,27 +26,55 @@
 
 namespace XbmcRemote {
 
-BrowseMoviesModel::BrowseMoviesModel() : m_cols()
-{
+BrowseMoviesModel::BrowseMoviesModel() :
+    m_cols() {
   set_column_types(m_cols);
 }
 
-BrowseMoviesModelColumns& BrowseMoviesModel::columns()
-{
+BrowseMoviesModelColumns& BrowseMoviesModel::columns() {
   return m_cols;
 }
 
 void BrowseMoviesModel::update(JsonPtr json) {
 // result -> sources -> file
   const Json::Value &result = (*json)["result"];
-  const Json::Value &sources = result["sources"];
+  std::string itemKey("");
 
-  for (unsigned int i = 0; i < sources.size(); i++) {
-    const Json::Value &item = sources[i];
+  clear();
+
+  if (m_breadcrumbs.size() >= 2) {
+    Gtk::TreeModel::Row parentRow = *append();
+    parentRow[m_cols.m_col_label] = "..";
+    parentRow[m_cols.m_col_type] = TYPE_PARENT;
+    parentRow[m_cols.m_col_path] = m_breadcrumbs[m_breadcrumbs.size() - 2].path;
+  }
+
+  if (result.isMember("sources")) {
+    itemKey = "sources";
+  } else if (result.isMember("files")) {
+    itemKey = "files";
+  } else {
+    return;
+  }
+
+  const Json::Value &items = result[itemKey];
+
+  for (unsigned int i = 0; i < items.size(); i++) {
+    const Json::Value &item = items[i];
     Gtk::TreeModel::Row row = *append();
     row[m_cols.m_col_label] = item["label"].asString();
-    std::cout << "adding " << item["label"].asString() << std::endl;
-    row[m_cols.m_col_path] = item["path"].asString();
+    row[m_cols.m_col_thumbnail] = item["thumbnail"].asString();
+    row[m_cols.m_col_path] = item["file"].asString();
+    if (itemKey == "files") {
+      Glib::ustring fileType = item["filetype"].asString();
+      if (fileType == "directory") {
+        row[m_cols.m_col_type] = TYPE_DIRECTORY;
+      } else if (fileType == "file") {
+        row[m_cols.m_col_type] = TYPE_FILE;
+      }
+    } else if (itemKey == "sources") {
+      row[m_cols.m_col_type] = TYPE_SOURCE;
+    }
   }
 }
 

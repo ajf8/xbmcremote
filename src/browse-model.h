@@ -24,6 +24,28 @@
 
 namespace XbmcRemote {
 
+#define TYPE_SOURCE (1 << 0)
+#define TYPE_PARENT (1 << 1)
+#define TYPE_FILE (1 << 2)
+#define TYPE_DIRECTORY (1 << 3)
+#define TYPE_ROOT (1 << 4)
+
+class BrowseBreadcrumb {
+public:
+  Glib::ustring name;
+  Glib::ustring path;
+  unsigned int type;
+};
+
+class BrowseModel : public Gtk::ListStore {
+public:
+  void add_breadcrumb(BrowseBreadcrumb& crumb);
+  void pop_breadcrumbs(unsigned int n);
+protected:
+  BrowseModel();
+  std::vector<BrowseBreadcrumb> m_breadcrumbs;
+};
+
 class BrowseModelColumns : public Gtk::TreeModel::ColumnRecord
 {
 public:
@@ -31,18 +53,15 @@ public:
     add(m_col_label);
     add(m_col_path);
     add(m_col_thumbnail);
+    add(m_col_type);
     add(m_col_playcount);
   }
 
   Gtk::TreeModelColumn<Glib::ustring> m_col_thumbnail;
   Gtk::TreeModelColumn<Glib::ustring> m_col_label;
   Gtk::TreeModelColumn<Glib::ustring> m_col_path;
+  Gtk::TreeModelColumn<unsigned int> m_col_type;
   Gtk::TreeModelColumn<unsigned int> m_col_playcount;
-};
-
-class BrowseModel : public Gtk::ListStore {
-protected:
-  BrowseModel();
 };
 
 }

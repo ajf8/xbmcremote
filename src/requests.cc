@@ -121,6 +121,47 @@ Json::Value Requests::get_items(RequestIdentifier id, uint playlistid)
   return value;
 }
 
+/* {"jsonrpc": "2.0", "method": "Player.Open", "params" : { "item" : { "playlistid" : 1, "position": 0 } }, "id": 1 */
+Json::Value Requests::player_open(uint position, uint playlistid)
+{
+  Json::Value value;
+  Json::Value params;
+  Json::Value item;
+
+  value["jsonrpc"] = "2.0";
+  value["method"] = "Player.Open";
+
+  item["playlistid"] = playlistid;
+  item["position"] = position;
+
+  params["item"] = item;
+
+  value["id"] = ID_PLAYER_OPEN;
+  value["params"] = params;
+
+  return value;
+}
+
+Json::Value Requests::playlist_add(const std::string &file, uint playlist_id)
+{
+  Json::Value value;
+  Json::Value params;
+  Json::Value item;
+
+  value["jsonrpc"] = "2.0";
+  value["method"] = "Playlist.Add";
+
+  item["file"] = file;
+
+  params["playlistid"] = playlist_id;
+  params["item"] = item;
+
+  value["id"] = ID_PLAYLIST_ADD;
+  value["params"] = params;
+
+  return value;
+}
+
 /*
 {"jsonrpc": "2.0", "method": "Player.GetProperties", "params": {
 "playerid": 1, "properties": [ "playlistid", "speed", "position", "totaltime",
@@ -163,6 +204,20 @@ Json::Value Requests::get_sources(const std::string &media)
 	  value["params"] = params;
 
 	  return value;
+}
+
+Json::Value Requests::get_directory(const std::string &directory) {
+  Json::Value value;
+  Json::Value params;
+
+  value["jsonrpc"] = "2.0";
+  value["method"] = "Files.GetDirectory";
+  value["id"] = ID_GET_DIRECTORY;
+
+  params["directory"] = directory;
+  value["params"] = params;
+
+  return value;
 }
 
 }
