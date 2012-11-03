@@ -256,7 +256,10 @@ void Client::handle_json_idle(JsonPtr root_ptr) {
 
 void Client::handle_json(JsonPtr root_ptr) {
   const Json::Value &root = *root_ptr;
-  std::cout << root.toStyledString();
+
+  if (root["id"].asInt() != ID_PING) {
+    std::cout << root.toStyledString();
+  }
 
   /* Queue handle_json_idle into the GTK main loop, check response there. */
 
@@ -419,9 +422,10 @@ void Client::open(unsigned int type, Glib::ustring &label, Glib::ustring &target
     m_movies_model->add_breadcrumb(crumb);
   }
 
-  if (type & TYPE_ROOT) {
+  if (target.empty()) { // TYPE_ROOT
     write(Requests::get_sources("video"));
   } else if (type & TYPE_FILE) {
+    write(Requests::playlist_clear());
     write(Requests::playlist_add(target));
     write(Requests::player_open());
   } else {
@@ -436,7 +440,9 @@ void Client::write(const Json::Value& value) {
   Json::FastWriter writer;
   std::string json = writer.write(value);
 
-  std::cout << "writing: " << json << std::endl;
+  if (value["id"].asInt() != ID_PING) {
+    std::cout << "writing: " << json << std::endl;
+  }
 
   boost::asio::async_write(m_socket, boost::asio::buffer(json, json.length()),
       boost::bind(&Client::handle_write, this, _1));

@@ -46,6 +46,7 @@ public:
   BrowseMoviesModel();
   BrowseMoviesModelColumns& columns();
   void update(JsonPtr json);
+
 protected:
   BrowseMoviesModelColumns m_cols;
 

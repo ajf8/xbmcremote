@@ -37,13 +37,23 @@ public:
   unsigned int type;
 };
 
+class BrowseModel;
+typedef sigc::signal<void, BrowseModel&, BrowseBreadcrumb&> BreadcrumbAddedSignal;
+typedef sigc::signal<void, BrowseModel&> BreadcrumbPopSignal;
+
 class BrowseModel : public Gtk::ListStore {
 public:
   void add_breadcrumb(BrowseBreadcrumb& crumb);
+  void pop_breadcrumb();
   void pop_breadcrumbs(unsigned int n);
+
+  BreadcrumbAddedSignal signal_breadcrumb_added();
+  BreadcrumbPopSignal signal_breadcrumb_pop();
 protected:
   BrowseModel();
   std::vector<BrowseBreadcrumb> m_breadcrumbs;
+  BreadcrumbAddedSignal m_signal_breadcrumb_added;
+  BreadcrumbPopSignal m_signal_breadcrumb_pop;
 };
 
 class BrowseModelColumns : public Gtk::TreeModel::ColumnRecord

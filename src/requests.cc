@@ -48,21 +48,6 @@ Json::Value Requests::play_pause(uint playerid)
   return generic_player("Player.PlayPause", ID_PLAY_PAUSE, playerid);
 }
 
-Json::Value Requests::playlist_clear(uint playlistid)
-{
-  Json::Value value;
-  Json::Value params;
-
-  params["playlistid"] = playlistid;
-
-  value["jsonrpc"] = "2.0";
-  value["method"] = "Playlist.Clear";
-  value["params"] = params;
-  value["id"] = ID_PLAYLIST_CLEAR;
-
-  return value;
-}
-
 Json::Value Requests::generic(const std::string &method, RequestIdentifier id)
 {
   Json::Value value;
@@ -137,6 +122,22 @@ Json::Value Requests::player_open(uint position, uint playlistid)
   params["item"] = item;
 
   value["id"] = ID_PLAYER_OPEN;
+  value["params"] = params;
+
+  return value;
+}
+
+Json::Value Requests::playlist_clear(uint playlist_id)
+{
+  Json::Value value;
+  Json::Value params;
+
+  value["jsonrpc"] = "2.0";
+  value["method"] = "Playlist.Clear";
+
+  params["playlistid"] = playlist_id;
+
+  value["id"] = ID_PLAYLIST_ADD;
   value["params"] = params;
 
   return value;

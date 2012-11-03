@@ -51,6 +51,7 @@ public:
   static Json::Value ping();
   static Json::Value get_active_players();
   static Json::Value get_items(RequestIdentifier id, uint playlistid = DEFAULT_PLAYER_ID);
+  static Json::Value playlist_clear(uint playlist_id = DEFAULT_PLAYLIST_ID);
   static Json::Value playlist_add(const std::string &file, uint playlist_id = DEFAULT_PLAYLIST_ID);
   static Json::Value get_properties(RequestIdentifier id, uint playerid = DEFAULT_PLAYER_ID);
   static Json::Value player_open(uint position = 0, uint playlist_id = DEFAULT_PLAYLIST_ID);
@@ -58,7 +59,6 @@ public:
   static Json::Value get_directory(const std::string &directory);
   static Json::Value play_pause(uint playerid = DEFAULT_PLAYER_ID);
   static Json::Value stop(uint playerid = DEFAULT_PLAYER_ID);
-  static Json::Value playlist_clear(uint playlistid = DEFAULT_PLAYLIST_ID);
   static Json::Value generic(const std::string &method, RequestIdentifier id = ID_DO_NOTHING);
   static Json::Value generic_player(const std::string &method, RequestIdentifier id = ID_DO_NOTHING, uint playerid = DEFAULT_PLAYER_ID);
 };

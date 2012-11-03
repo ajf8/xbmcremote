@@ -132,6 +132,7 @@ Gtk::Widget* MainWindow::create_browser() {
 
   builder->get_widget("browserBox", m_browserBox);
   builder->get_widget("browserTreeView", m_browserTreeView);
+  builder->get_widget("breadcrumbsBox", m_breadcrumbsBox);
 
   /*Gtk::TreeModel::Row row = *(m_browserModelMovies->append());
    row[columns.m_col_thumbnail] = "special://masterprofile/Thumbnails/Video/5/5d807579.tbn";
@@ -147,7 +148,25 @@ Gtk::Widget* MainWindow::create_browser() {
   m_browserTreeView->signal_row_activated().connect(
       sigc::mem_fun(*this, &MainWindow::on_browse_click));
 
+  m_client.get_movies_model()->signal_breadcrumb_added().connect(sigc::mem_fun(*this, &MainWindow::on_breadcrumb_added));
+  m_client.get_movies_model()->signal_breadcrumb_pop().connect(sigc::mem_fun(*this, &MainWindow::on_breadcrumb_pop));
+
   return m_browserBox;
+}
+
+void MainWindow::on_breadcrumb_added(BrowseModel &model, BrowseBreadcrumb &crumb)
+{
+  Gtk::Button* pButton = Gtk::manage(new Gtk::Button(crumb.name));
+  m_breadcrumbsBox->pack_start(*pButton, Gtk::PACK_SHRINK);
+  pButton->show_all();
+}
+
+void MainWindow::on_breadcrumb_pop(BrowseModel &model)
+{
+  std::vector<Gtk::Widget*> children = m_breadcrumbsBox->get_children();
+  Gtk::Widget *lastWidget = children.back();
+  if (lastWidget)
+    m_breadcrumbsBox->remove(*lastWidget);
 }
 
 void MainWindow::on_browse_click(const Gtk::TreeModel::Path& path,
@@ -300,7 +319,7 @@ void MainWindow::on_client_play(Client &client, uint playlistid) {
 void MainWindow::on_client_stop(Client &client, Client::JsonPtr json_ptr) {
   m_primaryLabel->set_text("Stopped.");
   set_playpause_dependent_widgets(client.get_state());
-  m_playlistImage->clear();
+  refresh_player(client);
 }
 
 void MainWindow::on_client_pause(Client &client, Client::JsonPtr json_ptr) {
@@ -324,7 +343,7 @@ void MainWindow::on_client_remote_error(Client &client,
     Client::JsonPtr json_ptr) {
   const Json::Value &root = *json_ptr;
   const Json::Value &error = root["error"];
-  Gtk::MessageDialog box(error["message"].asString(), false,
+  Gtk::MessageDialog box(*this, error["message"].asString(), false,
       Gtk::MESSAGE_ERROR);
   box.run();
 }
@@ -355,6 +374,8 @@ void MainWindow::refresh_player(Client &client) {
         cacheObject->signal_state_change().connect(
             sigc::mem_fun(*this, &MainWindow::cache_object_state_change));
         m_xvfs.fetch_async(cacheObject);
+      } else {
+        m_playImage->clear();
       }
     } catch (const Gdk::PixbufError &e) {
       std::cerr << "unable to get pixbuf" << std::endl;

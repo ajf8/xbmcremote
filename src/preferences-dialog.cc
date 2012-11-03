@@ -57,6 +57,8 @@ Gtk::Widget* PreferencesDialog::construct_connection_page()
   Gtk::Button *bt_dis;
 
   builder->get_widget("connection-vbox", m_currentPage);
+  m_pluginContainer->add(*m_currentPage);
+
   builder->get_widget("json_port_spin", jsonPortSpin);
   builder->get_widget("web_port_spin", webPortSpin);
   builder->get_widget("hostname_entry", hostnameEntry);
@@ -81,8 +83,6 @@ Gtk::Widget* PreferencesDialog::construct_connection_page()
   bind_active_sensitive(authCheck, passEntry);
   m_refSettings->bind("web-port", webPortSpin->property_value());
   m_refSettings->bind("rpc-port", jsonPortSpin->property_value());
-
-  m_pluginContainer->add(*m_currentPage);
 
   return m_currentPage;
 }

@@ -44,6 +44,8 @@ protected:
   void on_generic_request_click(const std::string &method);
   void on_generic_player_request_click(const std::string &method);
   void dispatch_request(Json::Value request);
+  void on_breadcrumb_added(BrowseModel &model, BrowseBreadcrumb &crumb);
+  void on_breadcrumb_pop(BrowseModel &model);
   void on_client_play(Client &client, uint playlistid);
   void on_client_stop(Client &client, Client::JsonPtr json_ptr);
   void on_client_pause(Client &client, Client::JsonPtr json_ptr);
@@ -94,6 +96,7 @@ protected:
 
   /* UI fields - player */
   Gtk::Box *m_playerBox;
+  Gtk::Box *m_breadcrumbsBox;
   Gtk::Window *m_mainWindow;
   Gtk::Button *m_playPauseButton;
   Gtk::Button *m_settingsButton;

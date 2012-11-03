@@ -29,12 +29,29 @@ BrowseModel::BrowseModel() : m_breadcrumbs()
 void BrowseModel::add_breadcrumb(BrowseBreadcrumb& crumb)
 {
   m_breadcrumbs.push_back(crumb);
+  m_signal_breadcrumb_added(*this, crumb);
+}
+
+void BrowseModel::pop_breadcrumb()
+{
+  m_breadcrumbs.pop_back();
+  m_signal_breadcrumb_pop(*this);
 }
 
 void BrowseModel::pop_breadcrumbs(unsigned int n)
 {
-  for (unsigned int i = 0; i < n; i++)
-    m_breadcrumbs.pop_back();
+  for (unsigned int i = 0; i < n && !m_breadcrumbs.empty(); i++)
+    pop_breadcrumb();
+}
+
+BreadcrumbAddedSignal BrowseModel::signal_breadcrumb_added()
+{
+  return m_signal_breadcrumb_added;
+}
+
+BreadcrumbPopSignal BrowseModel::signal_breadcrumb_pop()
+{
+  return m_signal_breadcrumb_pop;
 }
 
 }
